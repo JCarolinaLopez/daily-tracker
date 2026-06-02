@@ -1,4 +1,4 @@
-const CACHE = "daily-tracker-v1";
+const CACHE = "daily-tracker-v2";
 const ASSETS = ["./", "./index.html"];
 
 self.addEventListener("install", e => {
