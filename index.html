@@ -25,16 +25,15 @@
     --green: #7f9b6a;
     --red: #c25b4e;
     --streak: #d96020;
+    --ice: #5580aa;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0;
-    min-height: 100vh;
+    margin: 0; min-height: 100vh;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     background: linear-gradient(160deg, #f6ecdc 0%, #f0e0cb 100%);
     background-attachment: fixed;
-    color: var(--text);
-    line-height: 1.5;
+    color: var(--text); line-height: 1.5;
   }
 
   header {
@@ -45,14 +44,11 @@
   .header-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
   header h1 { margin: 0; font-size: 1.3rem; letter-spacing: .3px; }
   .today-pill {
-    background: var(--panel-2);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 4px 14px;
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 14px;
     font-size: .85rem; font-weight: 600; color: var(--muted);
   }
   .today-pill.all-done { background: #edf5e8; border-color: #b8d9a8; color: #4a7a38; }
-
   .month-nav { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
   .month-nav button {
     background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
@@ -63,58 +59,54 @@
 
   main { max-width: 680px; margin: 0 auto; padding: 20px 16px 80px; }
 
+  /* ---- Banner ---- */
+  .banner {
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
+    font-size: .9rem; display: flex; align-items: flex-start; gap: 10px;
+    background: #fff3e8; border: 1px solid #f5c89a; color: var(--text);
+  }
+  .banner.urgent { background: #fdf0ef; border-color: #f0b8b4; }
+  .banner-ico { font-size: 1.2rem; flex-shrink: 0; line-height: 1.4; }
+
+  /* ---- Cards ---- */
   .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 16px; padding: 20px; margin-bottom: 16px;
     box-shadow: 0 2px 8px rgba(74,59,48,.06);
   }
   .card h2 { margin: 0 0 14px; font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
 
   /* ---- Combined calendar ---- */
   .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-bottom: 14px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: .85rem; font-weight: 600; color: var(--text); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: .85rem; font-weight: 600; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
   .cal-header { text-align: center; font-size: .68rem; color: var(--muted); font-weight: 600; padding: 2px 0 6px; }
   .cal-day {
-    border-radius: 8px;
-    padding: 4px 2px 5px;
+    border-radius: 8px; padding: 4px 2px 5px;
     display: flex; flex-direction: column; align-items: center; gap: 3px;
-    min-height: 44px;
-    background: var(--panel-2);
-    border: 1px solid transparent;
+    min-height: 44px; background: var(--panel-2); border: 1px solid transparent;
   }
   .cal-day.today { border-color: var(--accent); background: #fdf4ef; }
   .cal-day.future { opacity: .35; }
   .cal-empty { min-height: 44px; }
-  .cal-num {
-    font-size: .72rem; font-weight: 700; color: var(--text);
-    line-height: 1;
-  }
+  .cal-num { font-size: .72rem; font-weight: 700; color: var(--text); line-height: 1; }
   .cal-day.today .cal-num { color: var(--accent); }
   .cal-day.future .cal-num { color: var(--muted); }
   .cal-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; }
-  .cdot {
-    width: 7px; height: 7px; border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .cdot.done { /* color via inline style */ }
+  .cdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
   .cdot.missed { background: transparent; border: 1.5px solid var(--line); }
+  .cdot.frozen { background: #6b9fd4; }
 
   /* ---- Task cards ---- */
   .task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px; }
   .task-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 16px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 16px;
     box-shadow: 0 2px 8px rgba(74,59,48,.06);
   }
-  .task-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .task-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
   .task-color-bar { width: 4px; height: 20px; border-radius: 999px; flex-shrink: 0; }
   .task-name-edit {
     flex: 1; min-width: 80px;
@@ -124,34 +116,35 @@
   }
   .task-name-edit:hover { border-bottom-color: var(--line); }
   .task-name-edit:focus { outline: none; border-bottom-color: var(--accent); background: var(--panel-2); border-radius: 4px; }
-  .streak-badge {
+
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .badge {
     display: flex; align-items: center; gap: 4px;
     border-radius: 999px; padding: 3px 10px;
-    font-size: .8rem; font-weight: 700; white-space: nowrap; flex-shrink: 0;
-    background: #fff3e8; border: 1px solid #f5c89a; color: var(--streak);
+    font-size: .78rem; font-weight: 700; white-space: nowrap; flex-shrink: 0;
   }
-  .streak-badge.zero { background: var(--panel-2); border-color: var(--line); color: var(--muted); font-weight: 500; }
+  .badge-streak { background: #fff3e8; border: 1px solid #f5c89a; color: var(--streak); }
+  .badge-streak.zero { background: var(--panel-2); border-color: var(--line); color: var(--muted); font-weight: 500; }
+  .badge-best { background: #f8f2e4; border: 1px solid #e8d9be; color: #8a6e30; }
+  .badge-week { background: var(--panel-2); border: 1px solid var(--line); color: var(--muted); }
+  .badge-week.full { background: #edf5e8; border-color: #b8d9a8; color: #4a7a38; }
+
   button.icon {
     background: none; border: none; color: var(--muted);
     cursor: pointer; font-size: 1rem; padding: 3px 6px; border-radius: 6px; flex-shrink: 0;
   }
   button.icon:hover { background: #fdf0ef; color: var(--red); }
 
-  .checkin { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .checkin { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
   .btn-done {
     border: none; padding: 9px 16px; border-radius: 10px;
     font-size: .9rem; font-weight: 700; cursor: pointer; font-family: inherit;
     display: flex; align-items: center; gap: 6px;
-    transition: filter .15s, transform .12s;
-    color: #fffaf2; flex-shrink: 0;
+    transition: filter .15s, transform .12s; color: #fffaf2; flex-shrink: 0;
   }
   .btn-done:hover { filter: brightness(1.1); }
   .btn-done:active { transform: scale(.97); }
-  .btn-done.is-done {
-    background: var(--panel-2) !important;
-    color: var(--text);
-    border: 1.5px solid var(--line);
-  }
+  .btn-done.is-done { background: var(--panel-2) !important; color: var(--text); border: 1.5px solid var(--line); }
   .note-input {
     flex: 1; min-width: 100px;
     background: var(--bg); border: 1px solid var(--line);
@@ -160,6 +153,15 @@
   }
   .note-input:focus { outline: none; border-color: var(--accent); }
   .done-note { font-size: .82rem; color: var(--muted); font-style: italic; }
+
+  .freeze-btn {
+    background: #eef4fb; border: 1px solid #b8d0ea; color: var(--ice);
+    padding: 7px 14px; border-radius: 10px;
+    font-size: .85rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .freeze-btn:hover { background: #dceaf5; }
+  .freeze-used { font-size: .82rem; color: var(--muted); padding: 4px 0; }
 
   /* ---- Add task ---- */
   .add-card { border: 2px dashed var(--line); background: transparent; box-shadow: none; }
@@ -207,6 +209,12 @@
 </header>
 
 <main>
+  <!-- Banner: shows when some tasks not done today -->
+  <div class="banner" id="todayBanner" style="display:none">
+    <span class="banner-ico" id="bannerIco">🌿</span>
+    <span id="bannerText"></span>
+  </div>
+
   <!-- Combined calendar -->
   <div class="card" id="calCard">
     <h2>This month</h2>
@@ -251,7 +259,8 @@ function defaultState() {
       { id: "t2", name: "Paper 2" },
       { id: "t3", name: "Paper 3" }
     ],
-    logs: []
+    logs: [],      // { id, taskId, date, note }
+    freezes: []    // { id, taskId, date }
   };
 }
 function loadState() {
@@ -259,8 +268,9 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultState();
     const s = Object.assign(defaultState(), JSON.parse(raw));
-    if (!Array.isArray(s.tasks)) s.tasks = [];
-    if (!Array.isArray(s.logs)) s.logs = [];
+    if (!Array.isArray(s.tasks))   s.tasks   = [];
+    if (!Array.isArray(s.logs))    s.logs    = [];
+    if (!Array.isArray(s.freezes)) s.freezes = [];
     return s;
   } catch(e) { return defaultState(); }
 }
@@ -293,25 +303,70 @@ function offsetDate(iso, days) {
   const date = new Date(y, m-1, d + days);
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
 }
+// Monday of the week containing iso
+function weekStart(iso) {
+  const [y,m,d] = iso.split("-").map(Number);
+  const date = new Date(y, m-1, d);
+  const dow = date.getDay(); // 0=Sun
+  date.setDate(date.getDate() - (dow === 0 ? 6 : dow - 1));
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+}
 
 let currentYm = ymOf(todayISO());
 
 /* ---------- Logic ---------- */
 function taskColor(idx) { return TASK_COLORS[idx % TASK_COLORS.length]; }
 function logFor(taskId, date) { return state.logs.find(l => l.taskId === taskId && l.date === date) || null; }
+function isFrozen(taskId, date) { return state.freezes.some(f => f.taskId === taskId && f.date === date); }
+function isDoneOrFrozen(taskId, date) {
+  return state.logs.some(l => l.taskId === taskId && l.date === date) || isFrozen(taskId, date);
+}
+
 function streakFor(taskId) {
   const today = todayISO();
-  const logDates = new Set(state.logs.filter(l => l.taskId === taskId).map(l => l.date));
-  const doneToday = logDates.has(today);
+  const doneToday = isDoneOrFrozen(taskId, today);
   let streak = 0, i = doneToday ? 0 : 1;
   while (i <= 3650) {
-    if (logDates.has(offsetDate(today, -i))) { streak++; i++; } else break;
+    if (isDoneOrFrozen(taskId, offsetDate(today, -i))) { streak++; i++; } else break;
   }
   return { streak, doneToday };
 }
+
+function personalBest(taskId) {
+  const logDates = state.logs.filter(l => l.taskId === taskId).map(l => l.date);
+  const freezeDates = state.freezes.filter(f => f.taskId === taskId).map(f => f.date);
+  const all = [...new Set([...logDates, ...freezeDates])].sort();
+  if (all.length === 0) return 0;
+  let best = 1, cur = 1;
+  for (let i = 1; i < all.length; i++) {
+    const diff = Math.round((new Date(all[i]) - new Date(all[i-1])) / 86400000);
+    if (diff === 1) { cur++; if (cur > best) best = cur; }
+    else cur = 1;
+  }
+  return best;
+}
+
+function weeklyConsistency(taskId) {
+  const today = todayISO();
+  const ws = weekStart(today);
+  let done = 0, elapsed = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = offsetDate(ws, i);
+    if (d > today) break;
+    elapsed++;
+    if (isDoneOrFrozen(taskId, d)) done++;
+  }
+  return { done, elapsed };
+}
+
+function freezesThisWeek(taskId) {
+  const ws = weekStart(todayISO());
+  return state.freezes.filter(f => f.taskId === taskId && weekStart(f.date) === ws).length;
+}
+
 function todayProgress() {
   const today = todayISO();
-  const done = state.tasks.filter(t => state.logs.some(l => l.taskId === t.id && l.date === today)).length;
+  const done = state.tasks.filter(t => isDoneOrFrozen(t.id, today)).length;
   return { done, total: state.tasks.length };
 }
 
@@ -319,6 +374,7 @@ function todayProgress() {
 function render() {
   document.getElementById("monthLabel").textContent = ymLabel(currentYm);
   renderTodayPill();
+  renderBanner();
   renderCalendar();
   renderTasks();
 }
@@ -331,8 +387,25 @@ function renderTodayPill() {
   pill.className = "today-pill" + (done === total ? " all-done" : "");
 }
 
+function renderBanner() {
+  const banner = document.getElementById("todayBanner");
+  const isToday = currentYm === ymOf(todayISO());
+  if (!isToday || !state.tasks.length) { banner.style.display = "none"; return; }
+
+  const missing = state.tasks.filter(t => !isDoneOrFrozen(t.id, todayISO()));
+  if (!missing.length) { banner.style.display = "none"; return; }
+
+  const hour = new Date().getHours();
+  const urgent = hour >= 20;
+  banner.style.display = "flex";
+  banner.className = "banner" + (urgent ? " urgent" : "");
+  document.getElementById("bannerIco").textContent = urgent ? "🌙" : "🌿";
+  document.getElementById("bannerText").innerHTML = urgent
+    ? `<b>Almost midnight!</b> Still time to check in: ${missing.map(t => escHtml(t.name)).join(", ")}`
+    : `Don't break the chain! Still need today: <b>${missing.map(t => escHtml(t.name)).join(", ")}</b>`;
+}
+
 function renderCalendar() {
-  // Legend
   document.getElementById("calLegend").innerHTML = state.tasks.map((t, i) =>
     `<div class="legend-item">
       <span class="legend-dot" style="background:${taskColor(i)}"></span>
@@ -340,23 +413,12 @@ function renderCalendar() {
     </div>`
   ).join("");
 
-  // Grid
   const today = todayISO();
   const [yr, mo] = currentYm.split("-").map(Number);
   const firstDow = new Date(yr, mo-1, 1).getDay();
   const dim = daysInMonth(currentYm);
 
-  // Build a log lookup: date -> Set of taskIds done
-  const doneMap = {};
-  state.logs.forEach(l => {
-    if (ymOf(l.date) === currentYm) {
-      if (!doneMap[l.date]) doneMap[l.date] = new Set();
-      doneMap[l.date].add(l.taskId);
-    }
-  });
-
   let html = DOW.map(l => `<div class="cal-header">${l}</div>`).join("");
-
   for (let i = 0; i < firstDow; i++) html += `<div class="cal-empty"></div>`;
 
   for (let d = 1; d <= dim; d++) {
@@ -369,10 +431,12 @@ function renderCalendar() {
 
     let dots = "";
     if (!isFuture) {
-      const doneTasks = doneMap[ds] || new Set();
       dots = state.tasks.map((t, i) => {
-        const done = doneTasks.has(t.id);
-        return `<span class="cdot ${done ? "done" : "missed"}" ${done ? `style="background:${taskColor(i)}"` : ""}></span>`;
+        const done = state.logs.some(l => l.taskId === t.id && l.date === ds);
+        const frozen = isFrozen(t.id, ds);
+        if (done) return `<span class="cdot" style="background:${taskColor(i)}"></span>`;
+        if (frozen) return `<span class="cdot frozen"></span>`;
+        return `<span class="cdot missed"></span>`;
       }).join("");
     }
 
@@ -381,7 +445,6 @@ function renderCalendar() {
       ${!isFuture ? `<div class="cal-dots">${dots}</div>` : ""}
     </div>`;
   }
-
   document.getElementById("calGrid").innerHTML = html;
 }
 
@@ -395,21 +458,45 @@ function renderTasks() {
   box.innerHTML = state.tasks.map((task, i) => {
     const color = taskColor(i);
     const { streak, doneToday } = streakFor(task.id);
+    const best = personalBest(task.id);
+    const { done: wDone, elapsed: wElapsed } = weeklyConsistency(task.id);
     const log = logFor(task.id, today);
+    const frozen = isFrozen(task.id, today);
+    const canFreeze = !doneToday && streak > 0 && freezesThisWeek(task.id) === 0;
+    const usedFreeze = freezesThisWeek(task.id) > 0 && !doneToday;
 
-    const streakHtml = streak > 0
-      ? `<div class="streak-badge">🔥 ${streak}d</div>`
-      : `<div class="streak-badge zero">no streak</div>`;
+    const streakBadge = streak > 0
+      ? `<span class="badge badge-streak">🔥 ${streak}d</span>`
+      : `<span class="badge badge-streak zero">no streak</span>`;
 
-    const checkinHtml = doneToday
-      ? `<div class="checkin">
-          <button class="btn-done is-done" data-undone="${task.id}">✓ Done</button>
-          ${log && log.note ? `<span class="done-note">"${escHtml(log.note)}"</span>` : ""}
-         </div>`
-      : `<div class="checkin">
-          <button class="btn-done" data-done="${task.id}" style="background:${color}">Mark done</button>
-          <input type="text" class="note-input" id="note-${task.id}" placeholder="Quick note…" maxlength="120">
-         </div>`;
+    const bestBadge = best > 0
+      ? `<span class="badge badge-best">🏆 ${best}d best</span>`
+      : "";
+
+    const weekFull = wDone === wElapsed && wElapsed > 0;
+    const weekBadge = `<span class="badge badge-week${weekFull ? " full" : ""}">📅 ${wDone}/${wElapsed} wk</span>`;
+
+    let checkinHtml;
+    if (frozen) {
+      checkinHtml = `<div class="checkin"><button class="btn-done is-done" data-undofreeze="${task.id}">🧊 Frozen today</button></div>`;
+    } else if (doneToday) {
+      checkinHtml = `<div class="checkin">
+        <button class="btn-done is-done" data-undone="${task.id}">✓ Done</button>
+        ${log && log.note ? `<span class="done-note">"${escHtml(log.note)}"</span>` : ""}
+      </div>`;
+    } else {
+      checkinHtml = `<div class="checkin">
+        <button class="btn-done" data-done="${task.id}" style="background:${color}">Mark done</button>
+        <input type="text" class="note-input" id="note-${task.id}" placeholder="Quick note…" maxlength="120">
+      </div>`;
+    }
+
+    let freezeHtml = "";
+    if (canFreeze) {
+      freezeHtml = `<button class="freeze-btn" data-freeze="${task.id}">🧊 Use streak freeze <span style="opacity:.65;font-weight:400;font-size:.78rem">(1 left this week)</span></button>`;
+    } else if (usedFreeze) {
+      freezeHtml = `<div class="freeze-used">🧊 Freeze used this week — no more until Monday.</div>`;
+    }
 
     return `
       <div class="task-card" data-taskcard="${task.id}">
@@ -417,10 +504,11 @@ function renderTasks() {
           <div class="task-color-bar" style="background:${color}"></div>
           <input type="text" class="task-name-edit" value="${escHtml(task.name)}"
                  data-rename="${task.id}" maxlength="60" aria-label="Task name">
-          ${streakHtml}
           <button class="icon" data-taskdel="${task.id}" title="Delete" aria-label="Delete task">🗑</button>
         </div>
+        <div class="badges" style="margin-bottom:10px">${streakBadge}${bestBadge}${weekBadge}</div>
         ${checkinHtml}
+        ${freezeHtml}
       </div>`;
   }).join("");
 }
@@ -434,9 +522,12 @@ document.getElementById("prevMonth").addEventListener("click", () => { currentYm
 document.getElementById("nextMonth").addEventListener("click", () => { currentYm = shiftYm(currentYm, 1); render(); });
 
 document.getElementById("taskList").addEventListener("click", e => {
-  const doneId   = e.target.getAttribute("data-done");
-  const undoneId = e.target.getAttribute("data-undone");
-  const delId    = e.target.getAttribute("data-taskdel");
+  const doneId      = e.target.getAttribute("data-done");
+  const undoneId    = e.target.getAttribute("data-undone");
+  const delId       = e.target.getAttribute("data-taskdel");
+  const freezeId    = e.target.getAttribute("data-freeze");
+  const undofreezeId = e.target.getAttribute("data-undofreeze");
+
   if (doneId) {
     const note = (document.getElementById(`note-${doneId}`) || {}).value || "";
     state.logs = state.logs.filter(l => !(l.taskId === doneId && l.date === todayISO()));
@@ -447,11 +538,20 @@ document.getElementById("taskList").addEventListener("click", e => {
     state.logs = state.logs.filter(l => !(l.taskId === undoneId && l.date === todayISO()));
     saveState(); render(); return;
   }
+  if (freezeId) {
+    state.freezes.push({ id: crypto.randomUUID(), taskId: freezeId, date: todayISO() });
+    saveState(); render(); return;
+  }
+  if (undofreezeId) {
+    state.freezes = state.freezes.filter(f => !(f.taskId === undofreezeId && f.date === todayISO()));
+    saveState(); render(); return;
+  }
   if (delId) {
     const task = state.tasks.find(t => t.id === delId);
     if (!task || !confirm(`Delete "${task.name}"? All its history will be removed.`)) return;
-    state.tasks = state.tasks.filter(t => t.id !== delId);
-    state.logs  = state.logs.filter(l => l.taskId !== delId);
+    state.tasks   = state.tasks.filter(t => t.id !== delId);
+    state.logs    = state.logs.filter(l => l.taskId !== delId);
+    state.freezes = state.freezes.filter(f => f.taskId !== delId);
     saveState(); render(); return;
   }
 });
