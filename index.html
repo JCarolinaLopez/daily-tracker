@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Daily Tracker</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3d7a5a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Daily Tracker">
+<style>
+  :root {
+    --bg: #f2f7f4;
+    --panel: #ffffff;
+    --panel-2: #eaf2ed;
+    --line: #cfe0d5;
+    --text: #263530;
+    --muted: #7a9485;
+    --accent: #3d7a5a;
+    --accent-2: #5fa87d;
+    --streak: #d96b28;
+    --red: #c0453a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--accent);
+    color: #fff;
+    padding: 18px 20px 14px;
+    position: sticky; top: 0; z-index: 20;
+    box-shadow: 0 2px 10px rgba(0,0,0,.12);
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  header h1 { margin: 0; font-size: 1.25rem; letter-spacing: .3px; }
+  .today-badge {
+    background: rgba(255,255,255,.18);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: .88rem; font-weight: 600;
+  }
+  .today-badge.all-done { background: rgba(255,255,255,.35); }
+
+  .month-nav { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .month-nav button {
+    background: rgba(255,255,255,.2); border: none; color: #fff;
+    width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 1.05rem;
+  }
+  .month-nav button:hover { background: rgba(255,255,255,.35); }
+  .month-nav .label { font-size: .9rem; font-weight: 600; min-width: 128px; text-align: center; opacity: .92; }
+
+  main { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* ---- Task card ---- */
+  .task-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .task-name-edit {
+    flex: 1; min-width: 100px;
+    background: transparent; border: none; border-bottom: 1.5px solid transparent;
+    color: var(--text); padding: 2px 4px;
+    font-size: 1.1rem; font-weight: 700; font-family: inherit;
+    border-radius: 0;
+  }
+  .task-name-edit:hover { border-bottom-color: var(--line); }
+  .task-name-edit:focus { outline: none; border-bottom-color: var(--accent); background: var(--panel-2); border-radius: 4px; border-bottom-style: solid; }
+
+  .streak-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: #fff3e8; border: 1px solid #f5c89a;
+    color: var(--streak); border-radius: 999px;
+    padding: 4px 12px; font-size: .85rem; font-weight: 700;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .streak-badge.zero { background: var(--panel-2); border-color: var(--line); color: var(--muted); font-weight: 500; }
+
+  /* ---- Check-in ---- */
+  .checkin { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .btn-done {
+    background: var(--accent); color: #fff; border: none;
+    padding: 10px 18px; border-radius: 10px;
+    font-size: .95rem; font-weight: 700; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+    transition: filter .15s, transform .12s;
+    flex-shrink: 0;
+  }
+  .btn-done:hover { filter: brightness(1.1); }
+  .btn-done:active { transform: scale(.97); }
+  .btn-done.is-done {
+    background: #e8f4ec; color: var(--accent);
+    border: 1.5px solid var(--accent);
+  }
+  .note-input {
+    flex: 1; min-width: 120px;
+    background: var(--bg); border: 1px solid var(--line);
+    color: var(--text); padding: 9px 12px;
+    border-radius: 10px; font-size: .9rem; font-family: inherit;
+  }
+  .note-input:focus { outline: none; border-color: var(--accent); }
+  .done-note { font-size: .85rem; color: var(--muted); font-style: italic; }
+
+  /* ---- Heatmap ---- */
+  .heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .hm-header { text-align: center; font-size: .68rem; color: var(--muted); font-weight: 600; padding: 2px 0 4px; }
+  .hm-day {
+    aspect-ratio: 1; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 600;
+  }
+  .hm-empty { background: transparent; }
+  .hm-done { background: var(--accent); color: #fff; }
+  .hm-done.hm-today { background: #2d5e43; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); }
+  .hm-missed { background: rgba(192,69,58,.1); color: #c0453a; }
+  .hm-missed.hm-today { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #c0453a; }
+  .hm-future { background: var(--panel-2); color: var(--muted); opacity: .4; }
+
+  /* ---- Delete button ---- */
+  button.icon {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 1.05rem; padding: 4px 7px; border-radius: 6px;
+    flex-shrink: 0;
+  }
+  button.icon:hover { background: #fdf0ef; color: var(--red); }
+
+  /* ---- Add task card ---- */
+  button.primary {
+    background: var(--accent); color: #fff; border: none;
+    padding: 10px 20px; border-radius: 10px;
+    font-size: .95rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover { filter: brightness(1.08); }
+  .add-card { border: 2px dashed var(--line); background: transparent; cursor: default; }
+  .add-card:hover { border-color: var(--accent-2); }
+  .add-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .add-input {
+    flex: 1; min-width: 160px;
+    background: var(--bg); border: 1px solid var(--line);
+    color: var(--text); padding: 10px 12px;
+    border-radius: 10px; font-size: 1rem; font-family: inherit;
+  }
+  .add-input:focus { outline: none; border-color: var(--accent); }
+
+  button.ghost {
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line); padding: 7px 13px;
+    border-radius: 9px; cursor: pointer; font-size: .85rem; font-family: inherit;
+  }
+  button.ghost:hover { background: var(--line); }
+
+  footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 20px; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  @media (max-width: 480px) {
+    .card { padding: 16px; }
+    .streak-badge { font-size: .8rem; padding: 3px 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>📋 Daily Tracker</h1>
+    <div class="today-badge" id="todayBadge">— / — today</div>
+  </div>
+  <div class="month-nav">
+    <button id="prevMonth" aria-label="Previous month">‹</button>
+    <span class="label" id="monthLabel"></span>
+    <button id="nextMonth" aria-label="Next month">›</button>
+  </div>
+</header>
+
+<main>
+  <div id="taskList"></div>
+  <div class="card add-card">
+    <div class="add-row">
+      <input type="text" class="add-input" id="newTaskName" placeholder="Add a new task…" maxlength="60">
+      <button class="primary" id="addTaskBtn">Add</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Data lives in your browser only. &nbsp;·&nbsp;
+  <button class="ghost" id="exportBtn">Export</button>
+  <button class="ghost" id="importBtn">Import</button>
+  <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+  <button class="ghost" id="resetBtn" style="color:var(--red)">Reset</button>
+</footer>
+
+<script>
+"use strict";
+
+const STORAGE_KEY = "dailyTracker.v1";
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DOW = ["S","M","T","W","T","F","S"];
+
+/* ---------- State ---------- */
+function defaultState() {
+  return {
+    version: 1,
+    tasks: [
+      { id: "t1", name: "Paper 1" },
+      { id: "t2", name: "Paper 2" },
+      { id: "t3", name: "Paper 3" }
+    ],
+    logs: []  // { id, taskId, date, note }
+  };
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    const s = Object.assign(defaultState(), JSON.parse(raw));
+    if (!Array.isArray(s.tasks)) s.tasks = [];
+    if (!Array.isArray(s.logs)) s.logs = [];
+    return s;
+  } catch(e) { return defaultState(); }
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+let state = loadState();
+
+/* ---------- Date helpers ---------- */
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function ymOf(iso) { return iso.slice(0,7); }
+function ymLabel(ym) {
+  const [y,m] = ym.split("-").map(Number);
+  return `${MONTH_NAMES[m-1]} ${y}`;
+}
+function shiftYm(ym, delta) {
+  let [y,m] = ym.split("-").map(Number);
+  m += delta;
+  while (m < 1) { m += 12; y--; }
+  while (m > 12) { m -= 12; y++; }
+  return `${y}-${String(m).padStart(2,"0")}`;
+}
+function daysInMonth(ym) {
+  const [y,m] = ym.split("-").map(Number);
+  return new Date(y, m, 0).getDate();
+}
+function offsetDate(iso, days) {
+  const [y,m,d] = iso.split("-").map(Number);
+  const date = new Date(y, m-1, d + days);
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+}
+
+let currentYm = ymOf(todayISO());
+
+/* ---------- Logic ---------- */
+function logFor(taskId, date) {
+  return state.logs.find(l => l.taskId === taskId && l.date === date) || null;
+}
+function streakFor(taskId) {
+  const today = todayISO();
+  const logDates = new Set(state.logs.filter(l => l.taskId === taskId).map(l => l.date));
+  const doneToday = logDates.has(today);
+  let streak = 0;
+  let i = doneToday ? 0 : 1;
+  while (i <= 3650) {
+    if (logDates.has(offsetDate(today, -i))) { streak++; i++; }
+    else break;
+  }
+  return { streak, doneToday };
+}
+function todayProgress() {
+  const today = todayISO();
+  const done = state.tasks.filter(t => state.logs.some(l => l.taskId === t.id && l.date === today)).length;
+  return { done, total: state.tasks.length };
+}
+
+/* ---------- Rendering ---------- */
+function render() {
+  document.getElementById("monthLabel").textContent = ymLabel(currentYm);
+  renderTodayBadge();
+  renderTasks();
+}
+function renderTodayBadge() {
+  const { done, total } = todayProgress();
+  const badge = document.getElementById("todayBadge");
+  badge.textContent = total === 0 ? "No tasks yet"
+    : done === total ? `${done} / ${total} ✓ all done!`
+    : `${done} / ${total} done today`;
+  badge.className = "today-badge" + (done === total && total > 0 ? " all-done" : "");
+}
+function renderTasks() {
+  const box = document.getElementById("taskList");
+  if (!state.tasks.length) {
+    box.innerHTML = `<div class="card"><p style="color:var(--muted);text-align:center;margin:8px 0">No tasks yet — add one below.</p></div>`;
+    return;
+  }
+  box.innerHTML = state.tasks.map(t => taskCardHtml(t)).join("");
+}
+function taskCardHtml(task) {
+  const today = todayISO();
+  const { streak, doneToday } = streakFor(task.id);
+  const log = logFor(task.id, today);
+
+  const streakHtml = streak > 0
+    ? `<div class="streak-badge">🔥 ${streak} day${streak===1?"":"s"}</div>`
+    : `<div class="streak-badge zero">— no streak yet</div>`;
+
+  const checkinHtml = doneToday
+    ? `<div class="checkin">
+        <button class="btn-done is-done" data-undone="${task.id}">✓ Done today</button>
+        ${log && log.note ? `<span class="done-note">"${escHtml(log.note)}"</span>` : ""}
+       </div>`
+    : `<div class="checkin">
+        <button class="btn-done" data-done="${task.id}">Mark done today</button>
+        <input type="text" class="note-input" id="note-${task.id}" placeholder="Note (optional)…" maxlength="120">
+       </div>`;
+
+  const [yr, mo] = currentYm.split("-").map(Number);
+  const firstDow = new Date(yr, mo-1, 1).getDay();
+  const dim = daysInMonth(currentYm);
+  const logDates = new Set(state.logs.filter(l => l.taskId === task.id).map(l => l.date));
+
+  let hm = DOW.map(l => `<div class="hm-header">${l}</div>`).join("");
+  for (let i = 0; i < firstDow; i++) hm += `<div class="hm-day hm-empty"></div>`;
+  for (let d = 1; d <= dim; d++) {
+    const ds = `${currentYm}-${String(d).padStart(2,"0")}`;
+    const isToday = ds === today;
+    const isFuture = ds > today;
+    const isDone = logDates.has(ds);
+    let cls = "hm-day";
+    if (isFuture)     cls += " hm-future";
+    else if (isDone)  cls += " hm-done"   + (isToday ? " hm-today" : "");
+    else              cls += " hm-missed" + (isToday ? " hm-today" : "");
+    hm += `<div class="${cls}">${d}</div>`;
+  }
+
+  return `
+    <div class="card" data-taskcard="${task.id}">
+      <div class="task-head">
+        <input type="text" class="task-name-edit" value="${escHtml(task.name)}"
+               data-rename="${task.id}" maxlength="60" aria-label="Task name">
+        ${streakHtml}
+        <button class="icon" data-taskdel="${task.id}" title="Delete task" aria-label="Delete task">🗑</button>
+      </div>
+      ${checkinHtml}
+      <div class="heatmap">${hm}</div>
+    </div>`;
+}
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* ---------- Events ---------- */
+document.getElementById("prevMonth").addEventListener("click", () => { currentYm = shiftYm(currentYm, -1); render(); });
+document.getElementById("nextMonth").addEventListener("click", () => { currentYm = shiftYm(currentYm, 1); render(); });
+
+// Mark done / undo / delete (delegated)
+document.getElementById("taskList").addEventListener("click", e => {
+  const doneId   = e.target.getAttribute("data-done");
+  const undoneId = e.target.getAttribute("data-undone");
+  const delId    = e.target.getAttribute("data-taskdel");
+
+  if (doneId) {
+    const note = (document.getElementById(`note-${doneId}`) || {}).value || "";
+    state.logs = state.logs.filter(l => !(l.taskId === doneId && l.date === todayISO()));
+    state.logs.push({ id: crypto.randomUUID(), taskId: doneId, date: todayISO(), note: note.trim() });
+    saveState(); render(); return;
+  }
+  if (undoneId) {
+    state.logs = state.logs.filter(l => !(l.taskId === undoneId && l.date === todayISO()));
+    saveState(); render(); return;
+  }
+  if (delId) {
+    const task = state.tasks.find(t => t.id === delId);
+    if (!task) return;
+    if (!confirm(`Delete "${task.name}"? All its history will be removed.`)) return;
+    state.tasks = state.tasks.filter(t => t.id !== delId);
+    state.logs  = state.logs.filter(l => l.taskId !== delId);
+    saveState(); render(); return;
+  }
+});
+
+// Press Enter in note field to submit
+document.getElementById("taskList").addEventListener("keydown", e => {
+  if (e.key !== "Enter" || !e.target.id || !e.target.id.startsWith("note-")) return;
+  e.preventDefault();
+  const btn = document.querySelector(`[data-done="${e.target.id.replace("note-","")}"]`);
+  if (btn) btn.click();
+});
+
+// Rename on blur
+document.getElementById("taskList").addEventListener("change", e => {
+  const renameId = e.target.getAttribute("data-rename");
+  if (!renameId) return;
+  const task = state.tasks.find(t => t.id === renameId);
+  if (!task) return;
+  const newName = e.target.value.trim();
+  if (!newName) { e.target.value = task.name; return; }
+  task.name = newName;
+  saveState(); render();
+});
+
+// Add task
+document.getElementById("addTaskBtn").addEventListener("click", () => {
+  const name = document.getElementById("newTaskName").value.trim();
+  if (!name) { document.getElementById("newTaskName").focus(); return; }
+  state.tasks.push({ id: crypto.randomUUID(), name });
+  saveState();
+  document.getElementById("newTaskName").value = "";
+  render();
+});
+document.getElementById("newTaskName").addEventListener("keydown", e => {
+  if (e.key === "Enter") { e.preventDefault(); document.getElementById("addTaskBtn").click(); }
+});
+
+// Export
+document.getElementById("exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `daily-tracker-${todayISO()}.json`; a.click();
+  URL.revokeObjectURL(url);
+});
+
+// Import
+document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change", e => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data.tasks)) throw new Error("Invalid file.");
+      if (!confirm(`Import this backup? It has ${data.tasks.length} task(s) and will replace your current data.`)) return;
+      state = Object.assign(defaultState(), data);
+      saveState(); currentYm = ymOf(todayISO()); render();
+      alert("Imported ✅");
+    } catch(err) { alert("Could not import: " + err.message); }
+    finally { e.target.value = ""; }
+  };
+  reader.readAsText(file);
+});
+
+// Reset
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (confirm("Delete ALL data and start fresh?")) {
+    state = defaultState(); saveState(); currentYm = ymOf(todayISO()); render();
+  }
+});
+
+/* ---------- Go ---------- */
+render();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+</script>
+</body>
+</html>
