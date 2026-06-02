@@ -163,6 +163,39 @@
   .freeze-btn:hover { background: #dceaf5; }
   .freeze-used { font-size: .82rem; color: var(--muted); padding: 4px 0; }
 
+  /* ---- Complete task button ---- */
+  .complete-btn {
+    width: 100%; margin-top: 10px; padding: 8px;
+    background: transparent; border: 1px dashed var(--line);
+    color: var(--muted); border-radius: 10px;
+    font-size: .82rem; cursor: pointer; font-family: inherit;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .complete-btn:hover { background: #edf5e8; border-color: #b8d9a8; color: #4a7a38; }
+
+  /* ---- Completed section ---- */
+  .completed-section { margin-top: 8px; }
+  .completed-section h2 {
+    font-size: .82rem; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .5px; font-weight: 600; margin: 0 0 10px; padding: 0 4px;
+  }
+  .completed-item {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    opacity: .75;
+  }
+  .completed-item:hover { opacity: 1; }
+  .completed-name { font-weight: 700; flex: 1; min-width: 100px; text-decoration: line-through; color: var(--muted); }
+  .completed-stats { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .completed-stat { font-size: .8rem; color: var(--muted); background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
+  .restore-btn {
+    background: var(--panel-2); border: 1px solid var(--line);
+    color: var(--muted); padding: 5px 12px; border-radius: 8px;
+    font-size: .8rem; cursor: pointer; font-family: inherit; flex-shrink: 0;
+  }
+  .restore-btn:hover { background: var(--line); color: var(--text); }
+
   /* ---- Add task ---- */
   .add-card { border: 2px dashed var(--line); background: transparent; box-shadow: none; }
   .add-card:hover { border-color: var(--accent-2); }
@@ -225,6 +258,9 @@
   <!-- Task check-in cards -->
   <div class="task-grid" id="taskList"></div>
 
+  <!-- Completed tasks -->
+  <div class="completed-section" id="completedSection" style="display:none"></div>
+
   <!-- Add task -->
   <div class="card add-card">
     <div class="add-row">
@@ -271,6 +307,7 @@ function loadState() {
     if (!Array.isArray(s.tasks))   s.tasks   = [];
     if (!Array.isArray(s.logs))    s.logs    = [];
     if (!Array.isArray(s.freezes)) s.freezes = [];
+    s.tasks.forEach(t => { if (!('completedAt' in t)) t.completedAt = null; });
     return s;
   } catch(e) { return defaultState(); }
 }
@@ -364,6 +401,10 @@ function freezesThisWeek(taskId) {
   return state.freezes.filter(f => f.taskId === taskId && weekStart(f.date) === ws).length;
 }
 
+function totalDaysFor(taskId) {
+  return new Set(state.logs.filter(l => l.taskId === taskId).map(l => l.date)).size;
+}
+
 function todayProgress() {
   const today = todayISO();
   const done = state.tasks.filter(t => isDoneOrFrozen(t.id, today)).length;
@@ -377,6 +418,7 @@ function render() {
   renderBanner();
   renderCalendar();
   renderTasks();
+  renderCompleted();
 }
 
 function renderTodayPill() {
@@ -455,7 +497,9 @@ function renderTasks() {
     return;
   }
   const today = todayISO();
-  box.innerHTML = state.tasks.map((task, i) => {
+  const active = state.tasks.map((t, i) => ({ task: t, i })).filter(({ task }) => !task.completedAt);
+  if (!active.length) { box.innerHTML = ""; return; }
+  box.innerHTML = active.map(({ task, i }) => {
     const color = taskColor(i);
     const { streak, doneToday } = streakFor(task.id);
     const best = personalBest(task.id);
@@ -509,8 +553,34 @@ function renderTasks() {
         <div class="badges" style="margin-bottom:10px">${streakBadge}${bestBadge}${weekBadge}</div>
         ${checkinHtml}
         ${freezeHtml}
+        <button class="complete-btn" data-complete="${task.id}">🏁 Mark this task as finished</button>
       </div>`;
   }).join("");
+}
+
+function renderCompleted() {
+  const section = document.getElementById("completedSection");
+  const done = state.tasks.filter(t => t.completedAt);
+  if (!done.length) { section.style.display = "none"; return; }
+  section.style.display = "block";
+  section.innerHTML = `<h2>🏁 Completed (${done.length})</h2>` +
+    done.map(task => {
+      const i = state.tasks.indexOf(task);
+      const color = taskColor(i);
+      const best = personalBest(task.id);
+      const total = totalDaysFor(task.id);
+      return `
+        <div class="completed-item">
+          <div class="task-color-bar" style="background:${color};height:16px"></div>
+          <span class="completed-name">${escHtml(task.name)}</span>
+          <div class="completed-stats">
+            <span class="completed-stat">📅 ${total} day${total===1?"":"s"} worked</span>
+            <span class="completed-stat">🏆 ${best}d best streak</span>
+            <span class="completed-stat">✓ ${task.completedAt}</span>
+          </div>
+          <button class="restore-btn" data-restore="${task.id}">Restore</button>
+        </div>`;
+    }).join("");
 }
 
 function escHtml(s) {
@@ -522,11 +592,12 @@ document.getElementById("prevMonth").addEventListener("click", () => { currentYm
 document.getElementById("nextMonth").addEventListener("click", () => { currentYm = shiftYm(currentYm, 1); render(); });
 
 document.getElementById("taskList").addEventListener("click", e => {
-  const doneId      = e.target.getAttribute("data-done");
-  const undoneId    = e.target.getAttribute("data-undone");
-  const delId       = e.target.getAttribute("data-taskdel");
-  const freezeId    = e.target.getAttribute("data-freeze");
+  const doneId       = e.target.getAttribute("data-done");
+  const undoneId     = e.target.getAttribute("data-undone");
+  const delId        = e.target.getAttribute("data-taskdel");
+  const freezeId     = e.target.getAttribute("data-freeze");
   const undofreezeId = e.target.getAttribute("data-undofreeze");
+  const completeId   = e.target.getAttribute("data-complete");
 
   if (doneId) {
     const note = (document.getElementById(`note-${doneId}`) || {}).value || "";
@@ -546,6 +617,12 @@ document.getElementById("taskList").addEventListener("click", e => {
     state.freezes = state.freezes.filter(f => !(f.taskId === undofreezeId && f.date === todayISO()));
     saveState(); render(); return;
   }
+  if (completeId) {
+    const task = state.tasks.find(t => t.id === completeId);
+    if (!task || !confirm(`Mark "${task.name}" as finished? It'll move to the Completed section. You can restore it anytime.`)) return;
+    task.completedAt = todayISO();
+    saveState(); render(); return;
+  }
   if (delId) {
     const task = state.tasks.find(t => t.id === delId);
     if (!task || !confirm(`Delete "${task.name}"? All its history will be removed.`)) return;
@@ -554,6 +631,16 @@ document.getElementById("taskList").addEventListener("click", e => {
     state.freezes = state.freezes.filter(f => f.taskId !== delId);
     saveState(); render(); return;
   }
+});
+
+// Restore completed task (delegated on completedSection)
+document.getElementById("completedSection").addEventListener("click", e => {
+  const restoreId = e.target.getAttribute("data-restore");
+  if (!restoreId) return;
+  const task = state.tasks.find(t => t.id === restoreId);
+  if (!task) return;
+  task.completedAt = null;
+  saveState(); render();
 });
 
 // Enter in note field = mark done
