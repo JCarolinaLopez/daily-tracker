@@ -221,10 +221,7 @@
   <!-- Pomodoro toggle -->
   <button class="pomo-toggle" id="pomoToggleBtn">
     <span class="pomo-toggle-left">🍅 Focus timer</span>
-    <span class="pomo-toggle-right">
-      <span id="pomoToggleSub">tap to open</span>
-      <span class="pomo-chevron" id="pomoChevron">▾</span>
-    </span>
+    <span class="pomo-toggle-right"><span id="pomoToggleSub"></span></span>
   </button>
 
   <!-- Pomodoro panel -->
@@ -698,9 +695,7 @@ function escHtml(s) {
 /* ---------- Events ---------- */
 document.getElementById("pomoToggleBtn").addEventListener("click", () => {
   const panel = document.getElementById("pomoPanel");
-  const chevron = document.getElementById("pomoChevron");
-  const isOpen = panel.classList.toggle("open");
-  chevron.classList.toggle("open", isOpen);
+  panel.classList.toggle("open");
 });
 
 document.getElementById("prevMonth").addEventListener("click", () => { currentYm = shiftYm(currentYm, -1); render(); });
