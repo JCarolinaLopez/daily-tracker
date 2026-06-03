@@ -72,7 +72,7 @@
     transition: background .15s;
   }
   .pomo-toggle:hover { background: var(--panel-2); }
-  .pomo-toggle-left { display: flex; align-items: center; gap: 10px; font-size: .95rem; font-weight: 700; }
+  .pomo-toggle-left { display: flex; align-items: center; gap: 10px; font-size: .95rem; font-weight: 700; color: var(--text); }
   .pomo-toggle-right { font-size: .82rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
   .pomo-chevron { font-size: 1rem; transition: transform .2s; }
   .pomo-chevron.open { transform: rotate(180deg); }
@@ -226,7 +226,6 @@
 
   <!-- Pomodoro panel -->
   <div class="card pomo-card" id="pomoPanel">
-    <h2>🍅 Focus timer</h2>
     <div class="pomo-task-row">
       <select class="pomo-select" id="pomoTask"></select>
       <span class="pomo-mode" id="pomoMode">🍅 Focus · 25 min</span>
