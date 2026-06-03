@@ -509,7 +509,7 @@ function renderPomoDisplay() {
 function renderPomoToggleSub() {
   const total = totalPomosToday();
   const sub = document.getElementById("pomoToggleSub");
-  sub.textContent = total > 0 ? `${total} session${total===1?"":"s"} today` : "tap to open";
+  sub.textContent = total > 0 ? `${total} session${total===1?"":"s"} today` : "";
 }
 
 function renderPomoToday() {
